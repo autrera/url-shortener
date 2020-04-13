@@ -35,9 +35,16 @@ func handleRootPath(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(body))
 	} else {
 		// Let's search the short url
-		shortcode := r.URL.Path
-		shortcode = strings.TrimPrefix(shortcode, "/")
-		w.Write([]byte(shortcode))
+		shortUrl := strings.TrimPrefix(r.URL.Path, "/")
+		for _, v := range HumbleStorage {
+			if shortUrl == v.ShortUrl {
+				http.Redirect(w, r, v.LongUrl, 301)
+				return
+			}
+		}
+
+		http.Error(w, "404 not found", http.StatusNotFound)
+		return
 	}
 }
 
