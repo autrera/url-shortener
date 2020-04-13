@@ -72,6 +72,14 @@ func handleNewShortCode(w http.ResponseWriter, r *http.Request) {
 		HumbleStorage = append(HumbleStorage, registeredUrl)
 	}
 
+	// Send the short url for the url received
+	js, err := json.Marshal(NewShortCodePayload{ Url: registeredUrl.ShortUrl })
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(js)
 	fmt.Println(HumbleStorage)
 }
 
