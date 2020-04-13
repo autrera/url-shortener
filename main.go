@@ -63,8 +63,15 @@ func handleNewShortCode(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Create new short code
-	HumbleStorage = append(HumbleStorage, ShortCode{len(HumbleStorage) + 1, payload.Url, "http://localhost:8080/abcd"})
+	if registeredUrl.ShortUrl == "" {
+		// Generate the short code for this url
+		newShortCode := "abcd"
+
+		// Store the new short code
+		registeredUrl = ShortCode{len(HumbleStorage) + 1, payload.Url, newShortCode}
+		HumbleStorage = append(HumbleStorage, registeredUrl)
+	}
+
 	fmt.Println(HumbleStorage)
 }
 
