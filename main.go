@@ -56,6 +56,12 @@ func handleNewShortCode(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check if the url is not already registered!
+	var registeredUrl ShortCode;
+	for _, v := range HumbleStorage {
+		if v.LongUrl == payload.Url {
+			registeredUrl = v
+		}
+	}
 
 	// Create new short code
 	HumbleStorage = append(HumbleStorage, ShortCode{len(HumbleStorage) + 1, payload.Url, "http://localhost:8080/abcd"})
