@@ -8,17 +8,17 @@ import (
 	"strings"
 )
 
-type ShortCode struct {
+type CompressedUrl struct {
 	Id int
 	LongUrl string
 	ShortUrl string
 }
 
-type NewShortCodePayload struct {
+type NewShortUrlPayload struct {
 	Url string
 }
 
-var HumbleStorage []ShortCode
+var HumbleStorage []CompressedUrl
 
 func handleRootPath(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
@@ -41,14 +41,14 @@ func handleRootPath(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func handleNewShortCode(w http.ResponseWriter, r *http.Request) {
+func handleNewShortUrl(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "404 not found", http.StatusNotFound)
 		return
 	}
 
 	// Get the body data
-	var payload NewShortCodePayload;
+	var payload NewShortUrlPayload;
 	err := json.NewDecoder(r.Body).Decode(&payload)
 	if err != nil {
 		http.Error(w, "404 not found", http.StatusNotFound)
@@ -56,7 +56,7 @@ func handleNewShortCode(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check if the url is not already registered!
-	var registeredUrl ShortCode;
+	var registeredUrl CompressedUrl;
 	for _, v := range HumbleStorage {
 		if v.LongUrl == payload.Url {
 			registeredUrl = v
@@ -65,15 +65,15 @@ func handleNewShortCode(w http.ResponseWriter, r *http.Request) {
 
 	if registeredUrl.ShortUrl == "" {
 		// Generate the short code for this url
-		newShortCode := "abcd"
+		newShortUrlCode := "abcd"
 
 		// Store the new short code
-		registeredUrl = ShortCode{len(HumbleStorage) + 1, payload.Url, newShortCode}
+		registeredUrl = CompressedUrl{len(HumbleStorage) + 1, payload.Url, newShortUrlCode}
 		HumbleStorage = append(HumbleStorage, registeredUrl)
 	}
 
 	// Send the short url for the url received
-	js, err := json.Marshal(NewShortCodePayload{ Url: registeredUrl.ShortUrl })
+	js, err := json.Marshal(NewShortUrlPayload{ Url: registeredUrl.ShortUrl })
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -85,7 +85,7 @@ func handleNewShortCode(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	http.HandleFunc("/", handleRootPath)
-	http.HandleFunc("/shortcodes", handleNewShortCode)
+	http.HandleFunc("/short-urls", handleNewShortUrl)
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		panic(err)
 	}
