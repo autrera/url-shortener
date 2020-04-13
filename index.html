@@ -62,7 +62,7 @@
             if (!isValidUrl(url)) {
                 alert("Please, be nice and type a valid url ;)");
             }
-            fetch("/shortcodes", {
+            fetch("/short-urls", {
                 method: "POST",
                 body: JSON.stringify({ url: url }),
             })
