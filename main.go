@@ -1,10 +1,15 @@
 package main
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"strings"
 )
+
+type NewShortCodePayload struct {
+	Url string
+}
 
 func handleRootPath(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
@@ -32,7 +37,14 @@ func handleNewShortCode(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "404 not found", http.StatusNotFound)
 		return
 	}
-	w.Write([]byte("Creating the short code"))
+	// Get the body data
+	var payload NewShortCodePayload;
+	err := json.NewDecoder(r.Body).Decode(&payload)
+	if err != nil {
+		http.Error(w, "404 not found", http.StatusNotFound)
+		return
+	}
+
 }
 
 func main() {
