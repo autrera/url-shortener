@@ -6,6 +6,18 @@
     </head>
     <body>
         <section id="main">
+            <h1 class="welcome">
+                Welcome to this humble url shortener!
+            </h1>
+            <div class="box">
+                <p class="box__instructions">
+                    Please, type or paste your long and hedius url into the input!
+                </p>
+                <input type="text" id="longUrl" class="box__input" onkeyup=submitCheck(event) />
+                <div class="box__button-container">
+                    <input onclick=generateShortUrl() type="button" class="box__button" value="Make it short!" />
+                </div>
+            </div>
         </section>
     </body>
     <script>
