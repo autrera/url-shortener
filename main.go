@@ -27,7 +27,7 @@ func handleRootPath(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func createShortCode(w http.ResponseWriter, r *http.Request) {
+func handleNewShortCode(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "404 not found", http.StatusNotFound)
 		return
@@ -37,7 +37,7 @@ func createShortCode(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	http.HandleFunc("/", handleRootPath)
-	http.HandleFunc("/shortcodes", createShortCode)
+	http.HandleFunc("/shortcodes", handleNewShortCode)
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		panic(err)
 	}
