@@ -9,6 +9,12 @@
         </section>
     </body>
     <script>
+        const submitCheck = (event) => {
+            if (event.keyCode == 13) {
+                generateShortUrl();
+            }
+        }
+
         window.onload = () => {
             console.log("Hello world!");
         };
