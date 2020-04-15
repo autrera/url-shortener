@@ -72,10 +72,11 @@ func handleNewShortUrl(w http.ResponseWriter, r *http.Request) {
 
 	if registeredUrl.ShortUrl == "" {
 		// Generate the short code for this url
-		newShortUrlCode := "abcd"
+		newId := len(HumbleStorage) + 1
+		newShortUrlCode := generateShortUrl(newId)
 
 		// Store the new short code
-		registeredUrl = CompressedUrl{len(HumbleStorage) + 1, payload.Url, newShortUrlCode}
+		registeredUrl = CompressedUrl{newId, payload.Url, newShortUrlCode}
 		HumbleStorage = append(HumbleStorage, registeredUrl)
 	}
 
