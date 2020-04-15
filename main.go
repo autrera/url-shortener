@@ -43,8 +43,8 @@ func compressUrl(longUrl string) (CompressedUrl, error) {
 	newId := len(HumbleStorage) + 1
 	newShortUrlCode := generateShortUrl(newId)
 
-	registeredUrl := CompressedUrl{newId, longUrl, newShortUrlCode}
-	return registeredUrl, nil
+	compressedUrl := CompressedUrl{newId, longUrl, newShortUrlCode}
+	return compressedUrl, nil
 }
 
 func storeCompressedUrl(compressedUrl CompressedUrl) () {
@@ -94,16 +94,16 @@ func handleNewShortUrl(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check if the url is not already registered!
-	registeredUrl, err := getCompressedUrlFromLongUrl(payload.Url)
+	compressedUrl, err := getCompressedUrlFromLongUrl(payload.Url)
 
-	if registeredUrl.ShortUrl == "" {
+	if compressedUrl.ShortUrl == "" {
 		// Generate the short code for this url
-		registeredUrl, _ = compressUrl(payload.Url)
-		storeCompressedUrl(registeredUrl)
+		compressedUrl, _ = compressUrl(payload.Url)
+		storeCompressedUrl(compressedUrl)
 	}
 
 	// Send the short url for the url received
-	js, err := json.Marshal(NewShortUrlPayload{ Url: registeredUrl.ShortUrl })
+	js, err := json.Marshal(NewShortUrlPayload{ Url: compressedUrl.ShortUrl })
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
