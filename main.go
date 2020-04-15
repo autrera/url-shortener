@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"errors"
 )
 
 type CompressedUrl struct {
@@ -19,6 +20,37 @@ type NewShortUrlPayload struct {
 }
 
 var HumbleStorage []CompressedUrl
+
+func getLongUrlFromShortUrl(shortUrl string) (string, error) {
+	for _, v := range HumbleStorage {
+		if shortUrl == v.ShortUrl {
+			return v.LongUrl, nil
+		}
+	}
+	return "", errors.New("Long url not found")
+}
+
+func getCompressedUrlFromLongUrl(longUrl string) (CompressedUrl, error) {
+	for _, v := range HumbleStorage {
+		if v.LongUrl == longUrl {
+			return v, nil
+		}
+	}
+	return CompressedUrl{0, "", ""}, errors.New("Compressed url not found")
+}
+
+func compressUrl(longUrl string) (CompressedUrl, error) {
+	newId := len(HumbleStorage) + 1
+	newShortUrlCode := generateShortUrl(newId)
+
+	registeredUrl := CompressedUrl{newId, longUrl, newShortUrlCode}
+	return registeredUrl, nil
+}
+
+func storeCompressedUrl(compressedUrl CompressedUrl) () {
+	HumbleStorage = append(HumbleStorage, compressedUrl)
+	fmt.Println(HumbleStorage)
+}
 
 func handleRootPath(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
@@ -36,14 +68,13 @@ func handleRootPath(w http.ResponseWriter, r *http.Request) {
 	} else {
 		// Let's search the short url
 		shortUrl := strings.TrimPrefix(r.URL.Path, "/")
-		for _, v := range HumbleStorage {
-			if shortUrl == v.ShortUrl {
-				http.Redirect(w, r, v.LongUrl, 301)
-				return
-			}
+		LongUrl, err := getLongUrlFromShortUrl(shortUrl)
+		if err != nil {
+			http.Error(w, "404 not found", http.StatusNotFound)
+			return
 		}
 
-		http.Error(w, "404 not found", http.StatusNotFound)
+		http.Redirect(w, r, LongUrl, 301)
 		return
 	}
 }
@@ -63,21 +94,12 @@ func handleNewShortUrl(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check if the url is not already registered!
-	var registeredUrl CompressedUrl;
-	for _, v := range HumbleStorage {
-		if v.LongUrl == payload.Url {
-			registeredUrl = v
-		}
-	}
+	registeredUrl, err := getCompressedUrlFromLongUrl(payload.Url)
 
 	if registeredUrl.ShortUrl == "" {
 		// Generate the short code for this url
-		newId := len(HumbleStorage) + 1
-		newShortUrlCode := generateShortUrl(newId)
-
-		// Store the new short code
-		registeredUrl = CompressedUrl{newId, payload.Url, newShortUrlCode}
-		HumbleStorage = append(HumbleStorage, registeredUrl)
+		registeredUrl, _ = compressUrl(payload.Url)
+		storeCompressedUrl(registeredUrl)
 	}
 
 	// Send the short url for the url received
@@ -88,7 +110,6 @@ func handleNewShortUrl(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(js)
-	fmt.Println(HumbleStorage)
 }
 
 func main() {
