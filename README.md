@@ -9,3 +9,15 @@ As for the storage I decided to go for a very simple array of structs. Because i
 to get specific for the storage since they may want to use something very different. The functions that interact with the storage are very
 short, easy to understand and on the top of the main.go file. So, modifying the functions to use any storage should be very simple.
 
+# How to run
+
+```go
+go run main.go urlshortener.go
+```
+
+You can also build it and then run it with:
+
+```go
+go build main.go urlshortener.go
+./main
+```
